@@ -14,6 +14,9 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import AdminPortal from './components/AdminPortal';
+import Groups from './pages/Groups';
+import CreateGroup from './pages/CreateGroup';
+import GroupDetails from './pages/GroupDetails';
 
 // Placeholder pages (to be built in later phases)
 const PlaceholderPage = ({ title }) => (
@@ -62,7 +65,7 @@ function App() {
             <Route path="/groups" element={
               <ProtectedRoute>
                 <Layout>
-                  <PlaceholderPage title="Groups" />
+                  <Groups />
                 </Layout>
               </ProtectedRoute>
             } />
@@ -70,7 +73,7 @@ function App() {
             <Route path="/groups/create" element={
               <ProtectedRoute>
                 <Layout>
-                  <PlaceholderPage title="Create Group" />
+                  <CreateGroup />
                 </Layout>
               </ProtectedRoute>
             } />
@@ -112,6 +115,14 @@ function App() {
                 <AdminPortal />
               </ProtectedRoute>
             } />
+
+            <Route path="/groups/:groupId" element={
+             <ProtectedRoute>
+              <Layout>
+                <GroupDetails />
+              </Layout>
+            </ProtectedRoute>
+          } />
 
             {/* Catch all route */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

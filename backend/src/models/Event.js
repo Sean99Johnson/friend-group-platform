@@ -32,6 +32,7 @@ const eventSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  invitedGroups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }], // ADD THIS LINE
   group: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Group',

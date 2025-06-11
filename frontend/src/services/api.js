@@ -62,17 +62,32 @@ export const groupsAPI = {
 
 // Events API functions
 export const eventsAPI = {
-  // EXISTING FUNCTIONS
-  getGroupEvents: (groupId) => api.get(`/groups/${groupId}/events`),
-  createEvent: (eventData) => api.post('/events', eventData),
-  updateEvent: (eventId, eventData) => api.put(`/events/${eventId}`, eventData),
-  deleteEvent: (eventId) => api.delete(`/events/${eventId}`),
-  rsvpEvent: (eventId, status) => api.put(`/events/${eventId}/rsvp`, { status }),
-  checkinEvent: (eventId, location) => api.post(`/events/${eventId}/checkin`, { location }),
-  
-  // MISSING FUNCTIONS - ADD THESE:
+  // Get all events for the authenticated user across all groups
   getUserEvents: () => api.get('/events/user'),
+  
+  // Get user's attendance statistics
   getUserAttendanceStats: () => api.get('/events/user/attendance-stats'),
+  
+  // Get events for a specific group
+  getGroupEvents: (groupId) => api.get(`/groups/${groupId}/events`),
+  
+  // Get specific event details
+  getEventDetails: (eventId) => api.get(`/events/${eventId}`),
+  
+  // Create a new event
+  createEvent: (eventData) => api.post('/events', eventData),
+  
+  // Update an event (organizer only)
+  updateEvent: (eventId, eventData) => api.put(`/events/${eventId}`, eventData),
+  
+  // Delete an event (organizer only)
+  deleteEvent: (eventId) => api.delete(`/events/${eventId}`),
+  
+  // RSVP to an event
+  rsvpEvent: (eventId, status) => api.put(`/events/${eventId}/rsvp`, { status }),
+  
+  // Check in to an event
+  checkinEvent: (eventId, location) => api.post(`/events/${eventId}/checkin`, { location })
 };
 
 // Fun Score API functions

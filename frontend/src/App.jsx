@@ -17,6 +17,10 @@ import AdminPortal from './components/AdminPortal';
 import Groups from './pages/Groups';
 import CreateGroup from './pages/CreateGroup';
 import GroupDetails from './pages/GroupDetails';
+import Events from './pages/Events';
+import CreateEvent from './pages/CreateEvent';
+import EventDetails from './pages/EventDetails';
+import EditEvent from './pages/EditEvent';
 
 // Placeholder pages (to be built in later phases)
 const PlaceholderPage = ({ title }) => (
@@ -81,7 +85,7 @@ function App() {
             <Route path="/events" element={
               <ProtectedRoute>
                 <Layout>
-                  <PlaceholderPage title="Events" />
+                  <Events />
                 </Layout>
               </ProtectedRoute>
             } />
@@ -89,7 +93,7 @@ function App() {
             <Route path="/events/create" element={
               <ProtectedRoute>
                 <Layout>
-                  <PlaceholderPage title="Create Event" />
+                  <CreateEvent/>
                 </Layout>
               </ProtectedRoute>
             } />
@@ -120,6 +124,20 @@ function App() {
              <ProtectedRoute>
               <Layout>
                 <GroupDetails />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/events/:eventId" element={
+            <ProtectedRoute>
+              <Layout>
+                <EventDetails />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/events/:eventId/edit" element={
+            <ProtectedRoute>
+              <Layout>
+                <EditEvent />
               </Layout>
             </ProtectedRoute>
           } />

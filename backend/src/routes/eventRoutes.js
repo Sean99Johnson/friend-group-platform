@@ -142,7 +142,7 @@ router.get('/user/attendance-stats', async (req, res) => {
 // Create a new event
 router.post('/', async (req, res) => {
   try {
-    const { title, description, dateTime, location, groupId } = req.body;
+    const { title, description, dateTime, location, groupId, invitedGroups } = req.body;
     const organizerId = req.user.id;
 
     // Verify the group exists and user is a member
@@ -166,7 +166,8 @@ router.post('/', async (req, res) => {
       dateTime,
       location,
       organizer: organizerId,
-      group: groupId
+      group: groupId,
+      invitedGroups: invitedGroups || [groupId] // Use provided groups or default to primary group
     });
 
     // Populate the created event
@@ -194,6 +195,7 @@ router.get('/:eventId', async (req, res) => {
     const event = await Event.findById(eventId)
       .populate('organizer', 'name email')
       .populate('group', 'name')
+      .populate('invitedGroups', 'name')
       .populate('attendees.user', 'name email');
 
     if (!event) {

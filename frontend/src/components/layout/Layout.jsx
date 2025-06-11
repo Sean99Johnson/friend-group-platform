@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import LoadingSpinner from '../ui/LoadingSpinner';

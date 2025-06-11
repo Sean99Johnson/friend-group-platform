@@ -62,8 +62,7 @@ router.get('/user/attendance-stats', async (req, res) => {
     const now = new Date();
     const pastEvents = await Event.find({
       group: { $in: groupIds },
-      dateTime: { $lt: now },
-      status: { $in: ['completed', 'ongoing'] }
+      dateTime: { $lt: now }
     });
 
     // Calculate attendance statistics
@@ -100,7 +99,8 @@ router.get('/user/attendance-stats', async (req, res) => {
     });
 
     // Calculate attendance rate
-    const attendanceRate = totalRSVPs > 0 ? Math.round((attendedEvents / totalRSVPs) * 100) : 100;
+    const attendanceRate = totalRSVPs > 0 ? 
+      Math.round((attendedEvents / totalRSVPs) * 100) : 100;
 
     // Get upcoming events count
     const upcomingEvents = await Event.countDocuments({
@@ -133,130 +133,6 @@ router.get('/user/attendance-stats', async (req, res) => {
     });
   } catch (error) {
     console.error('Error calculating attendance stats:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// ============== EVENT ACTIONS ==============
-
-// RSVP to an event
-router.put('/:eventId/rsvp', async (req, res) => {
-  try {
-    const { eventId } = req.params;
-    const { status } = req.body; // 'going', 'maybe', 'not_going'
-    const userId = req.user.id;
-
-    // Validate status
-    if (!['going', 'maybe', 'not_going'].includes(status)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid RSVP status. Must be going, maybe, or not_going' 
-      });
-    }
-
-    const event = await Event.findById(eventId);
-    if (!event) {
-      return res.status(404).json({ success: false, message: 'Event not found' });
-    }
-
-    // Check if user is a member of the group
-    const group = await Group.findById(event.group);
-    const isMember = group.members.some(member => member.user.toString() === userId);
-    
-    if (!isMember) {
-      return res.status(403).json({ 
-        success: false, 
-        message: 'You must be a member of this group to RSVP' 
-      });
-    }
-
-    // Find existing RSVP or create new one
-    const existingAttendeeIndex = event.attendees.findIndex(
-      attendee => attendee.user.toString() === userId
-    );
-
-    if (existingAttendeeIndex >= 0) {
-      // Update existing RSVP
-      event.attendees[existingAttendeeIndex].status = status;
-      event.attendees[existingAttendeeIndex].rsvpAt = new Date();
-    } else {
-      // Add new RSVP
-      event.attendees.push({
-        user: userId,
-        status,
-        rsvpAt: new Date()
-      });
-    }
-
-    await event.save();
-
-    // Populate the updated event
-    const updatedEvent = await Event.findById(eventId)
-      .populate('organizer', 'name email')
-      .populate('group', 'name')
-      .populate('attendees.user', 'name email');
-
-    res.json({
-      success: true,
-      message: `RSVP updated to ${status}`,
-      event: updatedEvent
-    });
-  } catch (error) {
-    console.error('Error updating RSVP:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// Check in to an event
-router.post('/:eventId/checkin', async (req, res) => {
-  try {
-    const { eventId } = req.params;
-    const { location } = req.body; // Optional location verification
-    const userId = req.user.id;
-
-    const event = await Event.findById(eventId);
-    if (!event) {
-      return res.status(404).json({ success: false, message: 'Event not found' });
-    }
-
-    // Check if event is today or in progress
-    const now = new Date();
-    const eventDate = new Date(event.dateTime);
-    const timeDiff = Math.abs(now - eventDate);
-    const hoursDiff = timeDiff / (1000 * 60 * 60);
-
-    if (hoursDiff > 24) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'You can only check in within 24 hours of the event time' 
-      });
-    }
-
-    // Find user's RSVP
-    const attendeeIndex = event.attendees.findIndex(
-      attendee => attendee.user.toString() === userId
-    );
-
-    if (attendeeIndex === -1) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'You must RSVP before checking in' 
-      });
-    }
-
-    // Update check-in status
-    event.attendees[attendeeIndex].checkedIn = true;
-    event.attendees[attendeeIndex].checkInTime = new Date();
-
-    await event.save();
-
-    res.json({
-      success: true,
-      message: 'Successfully checked in to event',
-      checkInTime: event.attendees[attendeeIndex].checkInTime
-    });
-  } catch (error) {
-    console.error('Error checking in to event:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -413,6 +289,130 @@ router.delete('/:eventId', async (req, res) => {
     });
   } catch (error) {
     console.error('Error deleting event:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// ============== EVENT ACTIONS ==============
+
+// RSVP to an event
+router.put('/:eventId/rsvp', async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { status } = req.body; // 'going', 'maybe', 'not_going'
+    const userId = req.user.id;
+
+    // Validate status
+    if (!['going', 'maybe', 'not_going'].includes(status)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid RSVP status. Must be going, maybe, or not_going' 
+      });
+    }
+
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ success: false, message: 'Event not found' });
+    }
+
+    // Check if user is a member of the group
+    const group = await Group.findById(event.group);
+    const isMember = group.members.some(member => member.user.toString() === userId);
+    
+    if (!isMember) {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'You must be a member of this group to RSVP' 
+      });
+    }
+
+    // Find existing RSVP or create new one
+    const existingAttendeeIndex = event.attendees.findIndex(
+      attendee => attendee.user.toString() === userId
+    );
+
+    if (existingAttendeeIndex >= 0) {
+      // Update existing RSVP
+      event.attendees[existingAttendeeIndex].status = status;
+      event.attendees[existingAttendeeIndex].rsvpAt = new Date();
+    } else {
+      // Add new RSVP
+      event.attendees.push({
+        user: userId,
+        status,
+        rsvpAt: new Date()
+      });
+    }
+
+    await event.save();
+
+    // Populate the updated event
+    const updatedEvent = await Event.findById(eventId)
+      .populate('organizer', 'name email')
+      .populate('group', 'name')
+      .populate('attendees.user', 'name email');
+
+    res.json({
+      success: true,
+      message: `RSVP updated to ${status}`,
+      event: updatedEvent
+    });
+  } catch (error) {
+    console.error('Error updating RSVP:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Check in to an event
+router.post('/:eventId/checkin', async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { location } = req.body; // Optional location verification
+    const userId = req.user.id;
+
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ success: false, message: 'Event not found' });
+    }
+
+    // Check if event is today or in progress
+    const now = new Date();
+    const eventDate = new Date(event.dateTime);
+    const timeDiff = Math.abs(now - eventDate);
+    const hoursDiff = timeDiff / (1000 * 60 * 60);
+
+    if (hoursDiff > 24) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'You can only check in within 24 hours of the event time' 
+      });
+    }
+
+    // Find user's RSVP
+    const attendeeIndex = event.attendees.findIndex(
+      attendee => attendee.user.toString() === userId
+    );
+
+    if (attendeeIndex === -1) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'You must RSVP before checking in' 
+      });
+    }
+
+    // Update check-in status
+    event.attendees[attendeeIndex].checkedIn = true;
+    event.attendees[attendeeIndex].checkInTime = new Date();
+
+    await event.save();
+
+    res.json({
+      success: true,
+      message: 'Successfully checked in to event',
+      checkInTime: event.attendees[attendeeIndex].checkInTime
+    });
+  } catch (error) {
+    console.error('Error checking in to event:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 });

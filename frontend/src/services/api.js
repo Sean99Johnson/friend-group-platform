@@ -50,7 +50,7 @@ export const authAPI = {
   }
 };
 
-// Groups API functions (ready for Phase 3)
+// Groups API functions
 export const groupsAPI = {
   getUserGroups: () => api.get('/groups'),
   createGroup: (groupData) => api.post('/groups', groupData),
@@ -60,17 +60,22 @@ export const groupsAPI = {
   leaveGroup: (groupId) => api.delete(`/groups/${groupId}/leave`),
 };
 
-// Events API functions (ready for Phase 4)
+// Events API functions
 export const eventsAPI = {
+  // EXISTING FUNCTIONS
   getGroupEvents: (groupId) => api.get(`/groups/${groupId}/events`),
   createEvent: (eventData) => api.post('/events', eventData),
   updateEvent: (eventId, eventData) => api.put(`/events/${eventId}`, eventData),
   deleteEvent: (eventId) => api.delete(`/events/${eventId}`),
   rsvpEvent: (eventId, status) => api.put(`/events/${eventId}/rsvp`, { status }),
   checkinEvent: (eventId, location) => api.post(`/events/${eventId}/checkin`, { location }),
+  
+  // MISSING FUNCTIONS - ADD THESE:
+  getUserEvents: () => api.get('/events/user'),
+  getUserAttendanceStats: () => api.get('/events/user/attendance-stats'),
 };
 
-// Fun Score API functions (ready for Phase 5)
+// Fun Score API functions
 export const funScoreAPI = {
   getUserScore: (userId, groupId) => api.get(`/scores/user/${userId}?groupId=${groupId}`),
   getGroupLeaderboard: (groupId) => api.get(`/scores/leaderboard/${groupId}`),

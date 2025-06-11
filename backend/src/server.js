@@ -9,7 +9,9 @@ const connectDB = require('./config/database');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
-const adminRoutes = require('./routes/adminRoutes'); // New admin routes
+const adminRoutes = require('./routes/adminRoutes');
+const groupRoutes = require('./routes/groupRoutes');  // ADD THIS
+const eventRoutes = require('./routes/eventRoutes');  // ADD THIS
 
 // Create Express app
 const app = express();
@@ -33,7 +35,9 @@ app.use('*', (req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/admin', adminRoutes); // Add admin routes
+app.use('/api/admin', adminRoutes);
+app.use('/api/groups', groupRoutes);   // ADD THIS
+app.use('/api/events', eventRoutes);   // ADD THIS
 
 // Health check route
 app.get('/', (req, res) => {
@@ -61,6 +65,7 @@ app.use((err, req, res, next) => {
 // 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({
+    
     success: false,
     message: 'Route not found'
   });

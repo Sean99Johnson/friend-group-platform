@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, Calendar, Trophy, Plus, Settings } from 'lucide-react';
+import { Home, Users, Calendar, Trophy, Plus, Settings, Shield } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 const Sidebar = () => {
   const location = useLocation();
+  const { user } = useAuth();
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -49,6 +51,32 @@ const Sidebar = () => {
                   );
                 })}
               </div>
+
+              {/* Admin Section - Only show if user is admin */}
+              {user?.isAdmin && (
+                <div className="mt-8">
+                  <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Administration
+                  </h3>
+                  <div className="mt-2 space-y-1">
+                    <Link
+                      to="/admin"
+                      className={`${
+                        isActive('/admin')
+                          ? 'bg-red-50 border-r-2 border-red-600 text-red-700'
+                          : 'text-gray-600 hover:bg-red-50 hover:text-red-700'
+                      } group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors`}
+                    >
+                      <Shield
+                        className={`${
+                          isActive('/admin') ? 'text-red-500' : 'text-gray-400 group-hover:text-red-500'
+                        } mr-3 h-5 w-5`}
+                      />
+                      Admin Portal
+                    </Link>
+                  </div>
+                </div>
+              )}
 
               {/* Quick Actions */}
               <div className="mt-8">

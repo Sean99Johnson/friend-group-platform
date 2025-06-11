@@ -13,6 +13,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import AdminPortal from './components/AdminPortal';
 
 // Placeholder pages (to be built in later phases)
 const PlaceholderPage = ({ title }) => (
@@ -103,6 +104,12 @@ function App() {
                 <Layout>
                   <PlaceholderPage title="Settings" />
                 </Layout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminPortal />
               </ProtectedRoute>
             } />
 

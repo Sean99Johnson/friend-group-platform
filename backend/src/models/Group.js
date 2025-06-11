@@ -3,13 +3,13 @@ const mongoose = require('mongoose');
 const groupSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Please provide a group name'],
-    trim: true,
-    maxlength: [50, 'Group name cannot be more than 50 characters']
+    required: [true, 'Group name is required'],
+    maxlength: [50, 'Group name cannot exceed 50 characters'],
+    trim: true
   },
   description: {
     type: String,
-    maxlength: [300, 'Description cannot be more than 300 characters'],
+    maxlength: [300, 'Description cannot exceed 300 characters'],
     default: ''
   },
   inviteCode: {
@@ -18,13 +18,13 @@ const groupSchema = new mongoose.Schema({
     required: true
   },
   admin: {
-    type: mongoose.Schema.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
   members: [{
     user: {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true
     },
@@ -34,27 +34,27 @@ const groupSchema = new mongoose.Schema({
     },
     role: {
       type: String,
-      enum: ['admin', 'member'],
+      enum: ['admin', 'moderator', 'member'],
       default: 'member'
     }
   }],
+  isActive: {
+    type: Boolean,
+    default: true
+  },
   settings: {
     isPrivate: {
       type: Boolean,
       default: false
     },
-    allowMemberInvites: {
-      type: Boolean,
-      default: true
-    },
     requireApproval: {
       type: Boolean,
       default: false
+    },
+    maxMembers: {
+      type: Number,
+      default: 50
     }
-  },
-  isActive: {
-    type: Boolean,
-    default: true
   }
 }, {
   timestamps: true
@@ -63,8 +63,7 @@ const groupSchema = new mongoose.Schema({
 // Generate unique invite code before saving
 groupSchema.pre('save', function(next) {
   if (!this.inviteCode) {
-    this.inviteCode = Math.random().toString(36).substring(2, 15) + 
-                     Math.random().toString(36).substring(2, 15);
+    this.inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
   }
   next();
 });

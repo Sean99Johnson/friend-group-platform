@@ -3,94 +3,89 @@ const mongoose = require('mongoose');
 const eventSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: [true, 'Please provide an event title'],
-    trim: true,
-    maxlength: [100, 'Title cannot be more than 100 characters']
+    required: [true, 'Event title is required'],
+    maxlength: [100, 'Title cannot exceed 100 characters'],
+    trim: true
   },
   description: {
     type: String,
-    maxlength: [500, 'Description cannot be more than 500 characters'],
+    maxlength: [500, 'Description cannot exceed 500 characters'],
     default: ''
   },
-  group: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Group',
-    required: true
+  dateTime: {
+    type: Date,
+    required: [true, 'Event date and time is required'],
+    validate: {
+      validator: function(v) {
+        return v > new Date();
+      },
+      message: 'Event date must be in the future'
+    }
   },
-  host: {
-    type: mongoose.Schema.ObjectId,
+  location: {
+    type: String,
+    required: [true, 'Event location is required'],
+    maxlength: [200, 'Location cannot exceed 200 characters']
+  },
+  organizer: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  location: {
-    name: {
-      type: String,
-      required: [true, 'Please provide a location name']
-    },
-    address: {
-      type: String,
-      required: [true, 'Please provide an address']
-    },
-    coordinates: {
-      lat: Number,
-      lng: Number
-    }
+  group: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Group',
+    required: true
   },
-  datetime: {
-    type: Date,
-    required: [true, 'Please provide event date and time']
-  },
-  capacity: {
-    type: Number,
-    min: [1, 'Capacity must be at least 1'],
-    default: 20
-  },
-  rsvps: [{
+  attendees: [{
     user: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
-      required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
     },
     status: {
       type: String,
       enum: ['going', 'maybe', 'not_going'],
-      required: true
+      default: 'going'
     },
-    rsvpedAt: {
-      type: Date,
-      default: Date.now
-    }
-  }],
-  checkins: [{
-    user: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    checkedInAt: {
+    rsvpAt: {
       type: Date,
       default: Date.now
     },
-    location: {
-      lat: Number,
-      lng: Number
+    checkedIn: {
+      type: Boolean,
+      default: false
+    },
+    checkInTime: {
+      type: Date
     }
   }],
-  eventType: {
+  status: {
     type: String,
-    enum: ['dinner', 'games', 'outdoor', 'sports', 'entertainment', 'other'],
-    default: 'other'
+    enum: ['upcoming', 'ongoing', 'completed', 'cancelled'],
+    default: 'upcoming'
   },
-  isActive: {
+  maxAttendees: {
+    type: Number,
+    default: null
+  },
+  tags: [{
+    type: String,
+    maxlength: 20
+  }],
+  isPublic: {
     type: Boolean,
-    default: true
+    default: false
   }
 }, {
   timestamps: true
 });
 
-// Index for efficient queries
-eventSchema.index({ group: 1, datetime: 1 });
-eventSchema.index({ host: 1 });
+// Virtual for attendee count
+eventSchema.virtual('attendeeCount').get(function() {
+  return this.attendees ? this.attendees.filter(a => a.status === 'going').length : 0;
+});
+
+// Ensure virtual fields are serialized
+eventSchema.set('toJSON', { virtuals: true });
 
 module.exports = mongoose.model('Event', eventSchema);

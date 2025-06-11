@@ -9,6 +9,7 @@ const connectDB = require('./config/database');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
+const adminRoutes = require('./routes/adminRoutes'); // New admin routes
 
 // Create Express app
 const app = express();
@@ -32,6 +33,7 @@ app.use('*', (req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes); // Add admin routes
 
 // Health check route
 app.get('/', (req, res) => {

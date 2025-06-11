@@ -24,6 +24,12 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Debug: Log all requests
+app.use('*', (req, res, next) => {
+  console.log(`${req.method} ${req.originalUrl} - Body:`, req.body);
+  next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 
@@ -34,6 +40,11 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     status: 'healthy'
   });
+});
+
+// Test route
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API routes working!' });
 });
 
 // Error handling middleware

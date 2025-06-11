@@ -72,7 +72,7 @@ const RegisterForm = () => {
 
     setIsSubmitting(true);
 
-    const { confirmPassword, ...registerData } = formData;
+    const { confirmPassword: _confirmPassword, ...registerData } = formData;
     const result = await register(registerData);
     
     if (result.success) {

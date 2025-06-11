@@ -1,80 +1,9 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useReducer, useEffect } from 'react';
 import { authAPI } from '../services/api';
+import { authReducer, initialState, AUTH_TYPES } from './authConstants';
 
 // Auth Context
 const AuthContext = createContext();
-
-// Initial state
-const initialState = {
-  user: null,
-  token: localStorage.getItem('token'),
-  isLoading: true,
-  isAuthenticated: false,
-  error: null,
-};
-
-// Action types
-const AUTH_TYPES = {
-  SET_LOADING: 'SET_LOADING',
-  LOGIN_SUCCESS: 'LOGIN_SUCCESS',
-  LOGOUT: 'LOGOUT',
-  SET_ERROR: 'SET_ERROR',
-  CLEAR_ERROR: 'CLEAR_ERROR',
-  UPDATE_USER: 'UPDATE_USER',
-};
-
-// Reducer function
-const authReducer = (state, action) => {
-  switch (action.type) {
-    case AUTH_TYPES.SET_LOADING:
-      return {
-        ...state,
-        isLoading: action.payload,
-      };
-
-    case AUTH_TYPES.LOGIN_SUCCESS:
-      return {
-        ...state,
-        user: action.payload.user,
-        token: action.payload.token,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-      };
-
-    case AUTH_TYPES.LOGOUT:
-      return {
-        ...state,
-        user: null,
-        token: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null,
-      };
-
-    case AUTH_TYPES.SET_ERROR:
-      return {
-        ...state,
-        error: action.payload,
-        isLoading: false,
-      };
-
-    case AUTH_TYPES.CLEAR_ERROR:
-      return {
-        ...state,
-        error: null,
-      };
-
-    case AUTH_TYPES.UPDATE_USER:
-      return {
-        ...state,
-        user: { ...state.user, ...action.payload },
-      };
-
-    default:
-      return state;
-  }
-};
 
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
@@ -198,15 +127,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-// Custom hook to use auth context
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };
 
 export default AuthContext;

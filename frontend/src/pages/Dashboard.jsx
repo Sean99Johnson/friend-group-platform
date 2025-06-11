@@ -1,8 +1,10 @@
+// src/pages/Dashboard.jsx - Updated with Fun Score Gauge
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Users, Calendar, Trophy, Plus, TrendingUp } from 'lucide-react';
 import Button from '../components/ui/Button';
+import FunScoreGauge from '../components/ui/FunScoreGauge';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -39,8 +41,28 @@ const Dashboard = () => {
         </p>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid with Fun Score Gauge */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Fun Score Gauge - Featured */}
+        <div className="lg:col-span-2">
+          <div className="card">
+            <div className="card-header">
+              <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                <Trophy className="h-5 w-5 text-yellow-500 mr-2" />
+                Your Fun Score
+              </h3>
+            </div>
+            <div className="card-body flex justify-center">
+              <FunScoreGauge 
+                score={mockStats.averageFunScore} 
+                size="lg"
+                animated={true}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Other Stats */}
         <div className="card">
           <div className="card-body">
             <div className="flex items-center">
@@ -68,32 +90,29 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="card">
+      {/* Additional Fun Score Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="card text-center">
           <div className="card-body">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Trophy className="h-8 w-8 text-yellow-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Average Fun Score</p>
-                <p className="text-2xl font-semibold text-gray-900">{mockStats.averageFunScore}</p>
-              </div>
-            </div>
+            <div className="text-3xl font-bold text-green-600">87%</div>
+            <div className="text-sm text-gray-500">Attendance Rate</div>
+            <div className="text-xs text-gray-400 mt-1">Last 3 months</div>
           </div>
         </div>
-
-        <div className="card">
+        <div className="card text-center">
           <div className="card-body">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <TrendingUp className="h-8 w-8 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Attendance Rate</p>
-                <p className="text-2xl font-semibold text-gray-900">{mockStats.attendanceRate}%</p>
-              </div>
-            </div>
+            <div className="text-3xl font-bold text-blue-600">8</div>
+            <div className="text-sm text-gray-500">Events Hosted</div>
+            <div className="text-xs text-gray-400 mt-1">This year</div>
+          </div>
+        </div>
+        <div className="card text-center">
+          <div className="card-body">
+            <div className="text-3xl font-bold text-purple-600">+24</div>
+            <div className="text-sm text-gray-500">Score Improvement</div>
+            <div className="text-xs text-gray-400 mt-1">This month</div>
           </div>
         </div>
       </div>
